@@ -18,7 +18,7 @@ public class MainServiceImplTest extends TestCase {
     private MainServiceImpl mainServiceImpl = new MainServiceImpl();
     @Test
     public void selectNodeByUserId(){
-        List<Node> nodes = mainServiceImpl.selectNode(1L);
+        List<Node> nodes = mainServiceImpl.selectNodes(1L);
         System.out.println(nodes);
     }
 }
