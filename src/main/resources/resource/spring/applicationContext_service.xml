@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 1. 设置spring 读取properties -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:resource/properties/jdbc.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- 2. 配置spring 对clob字段的支持 -->
+    <bean id="oracleLobHandler" class="org.springframework.jdbc.support.lob.OracleLobHandler" lazy-init="true">
+        <property name="nativeJdbcExtractor" ref="c3p0JdbcExtractor" />
+    </bean>
+    <bean id="dbcpJdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.CommonsDbcpNativeJdbcExtractor" lazy-init="true" />
+    <bean id="c3p0JdbcExtractor" class="org.springframework.jdbc.support.nativejdbc.C3P0NativeJdbcExtractor" lazy-init="true" />
+
+    <!-- 3. 配置spring上传文件 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- 设置上传文件的最大尺寸为1G -->
+        <property name="maxUploadSize">
+            <value>1073741824</value>
+        </property>
+        <property name="defaultEncoding">
+            <value>utf-8</value>
+        </property>
+    </bean>
+
+    <!-- 3、开启aspectj注解开发,自动代理 -->
+    <aop:aspectj-autoproxy/>
+
+    <!-- 4、事务管理器 -->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!-- 指定事务管理器使用的数据源 -->
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 5、声明通知 -->
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="search*" read-only="true"/>
+            <!--目标类中所有不以get、find、search开头的方法都以事务方式管理-->
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!-- 6、aop相关 -->
+    <aop:config>
+        <aop:pointcut id="txPointcut" expression="execution(* com.oa.service..*.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config>
+
+    <bean id="classService" class="com.oa.frame.service.impl.ClassService">
+        <property name="filepath">
+            <value>/resource/class_service</value>
+        </property>
+    </bean>
+    <!--<bean id="sqlService" class="com.oa.frame.service.impl.BatisService">
+        <property name="filepath">
+            <value>/resource/sql_service</value>
+        </property>
+    </bean>-->
+
+</beans>
