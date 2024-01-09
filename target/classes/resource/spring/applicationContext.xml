@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 1、导入applicationContext_db.xml配置文件 -->
+    <import resource="applicationContext_db.xml"/>
+
+    <!-- 2、导入applicationContext_service.xml配置文件 -->
+    <import resource="applicationContext_service.xml"/>
+
+    <!-- 3、导入applicationContext_controller.xml配置文件 -->
+    <import resource="applicationContext_controller.xml"/>
+
+    <!-- 4、导入applicationContext_dao.xml配置文件 -->
+    <import resource="applicationContext_dao.xml"/>
+</beans>
